@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Ultra Device Control Dashboard</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#050816;
+    overflow-x:hidden;
+    color:white;
+    min-height:100vh;
+}
+
+/* Animated Background */
+
+.bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:
+    radial-gradient(circle at top left,#0ff2 0%,transparent 20%),
+    radial-gradient(circle at bottom right,#ff00ff22 0%,transparent 20%),
+    linear-gradient(135deg,#050816,#0f172a);
+    z-index:-2;
+}
+
+.grid{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size:40px 40px;
+    z-index:-1;
+    animation:moveGrid 20s linear infinite;
+}
+
+@keyframes moveGrid{
+    0%{transform:translateY(0);}
+    100%{transform:translateY(40px);}
+}
+
+.container{
+    width:95%;
+    max-width:1400px;
+    margin:auto;
+    padding:30px;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.logo{
+    font-size:30px;
+    font-weight:700;
+    background:linear-gradient(90deg,#00ffff,#ff00ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.status{
+    display:flex;
+    gap:15px;
+}
+
+.badge{
+    padding:10px 20px;
+    border-radius:50px;
+    background:#ffffff10;
+    border:1px solid #ffffff20;
+    backdrop-filter:blur(10px);
+    font-size:14px;
+}
+
+/* Dashboard */
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+.card{
+    background:#ffffff08;
+    border:1px solid #ffffff20;
+    border-radius:25px;
+    padding:25px;
+    backdrop-filter:blur(18px);
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+
+.card:hover{
+    transform:translateY(-10px) scale(1.02);
+    border-color:#00ffff80;
+    box-shadow:0 0 30px #00ffff33;
+}
+
+.card::before{
+    content:'';
+    position:absolute;
+    width:180px;
+    height:180px;
+    background:linear-gradient(45deg,#00ffff22,#ff00ff22);
+    border-radius:50%;
+    top:-70px;
+    right:-70px;
+}
+
+.card h2{
+    margin-bottom:20px;
+    font-size:24px;
+}
+
+button{
+    border:none;
+    padding:14px 20px;
+    border-radius:14px;
+    cursor:pointer;
+    font-weight:600;
+    margin-top:12px;
+    transition:0.3s;
+}
+
+.primary{
+    background:linear-gradient(90deg,#00ffff,#0077ff);
+    color:black;
+}
+
+.secondary{
+    background:linear-gradient(90deg,#ff00ff,#ff0066);
+    color:white;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.device-list{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.device{
+    background:#ffffff10;
+    padding:15px;
+    border-radius:15px;
+    border:1px solid #ffffff15;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.signal{
+    width:100%;
+    height:10px;
+    border-radius:10px;
+    background:#222;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.signal span{
+    display:block;
+    height:100%;
+    width:80%;
+    background:linear-gradient(90deg,#00ff88,#00ffff);
+    animation:signalPulse 2s infinite;
+}
+
+@keyframes signalPulse{
+    0%{width:30%;}
+    50%{width:90%;}
+    100%{width:40%;}
+}
+
+.logs{
+    height:220px;
+    overflow:auto;
+    margin-top:15px;
+    padding-right:5px;
+}
+
+.log{
+    padding:10px;
+    margin-bottom:10px;
+    border-left:3px solid #00ffff;
+    background:#ffffff08;
+    border-radius:10px;
+    font-size:14px;
+}
+
+.voice{
+    width:120px;
+    height:120px;
+    margin:auto;
+    border-radius:50%;
+    background:radial-gradient(circle,#00ffff55,#0000);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation:pulse 2s infinite;
+    font-size:40px;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.1);}
+    100%{transform:scale(1);}
+}
+
+.footer{
+    text-align:center;
+    margin-top:40px;
+    color:#aaa;
+}
+
+@media(max-width:700px){
+    header{
+        flex-direction:column;
+        gap:15px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="grid"></div>
+
+<div class="container">
+
+<header>
+<div class="logo">DEVICE CONTROL X</div>
+
+<div class="status">
+<div class="badge">🟢 ONLINE</div>
+<div class="badge" id="wifiStatus">📶 WIFI READY</div>
+</div>
+</header>
+
+<div class="dashboard">
+
+<!-- Bluetooth -->
+
+<div class="card">
+<h2>🔵 Bluetooth Control</h2>
+
+<button class="primary" onclick="connectBluetooth()">
+Connect Bluetooth
+</button>
+
+<div class="device-list" id="bluetoothDevices">
+
+<div class="device">
+<span>No Device Connected</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- WiFi -->
+
+<div class="card">
+<h2>📡 WiFi Monitor</h2>
+
+<p>Current Network:</p>
+<h3 id="networkName">Detecting...</h3>
+
+<div class="signal">
+<span></span>
+</div>
+
+<button class="secondary" onclick="refreshWifi()">
+Refresh Network
+</button>
+
+</div>
+
+<!-- Device Actions -->
+
+<div class="card">
+<h2>⚡ Quick Actions</h2>
+
+<button class="primary" onclick="vibrateDevice()">
+Vibrate Device
+</button>
+
+<br>
+
+<button class="secondary" onclick="toggleFullscreen()">
+Fullscreen Mode
+</button>
+
+<br>
+
+<button class="primary" onclick="showBattery()">
+Battery Status
+</button>
+
+<div class="logs" id="actionLogs"></div>
+
+</div>
+
+<!-- Voice AI -->
+
+<div class="card">
+<h2>🎤 Voice Assistant</h2>
+
+<div class="voice">🎙</div>
+
+<button class="primary" onclick="startVoice()">
+Start Voice Command
+</button>
+
+<div class="logs" id="voiceLogs"></div>
+
+</div>
+
+</div>
+
+<div class="footer">
+Ultra Futuristic Device Dashboard © 2026
+</div>
+
+</div>
+
+<script>
+
+/* Logs */
+
+function addLog(message){
+    const logs = document.getElementById("actionLogs");
+
+    const div = document.createElement("div");
+    div.className = "log";
+    div.innerText = message;
+
+    logs.prepend(div);
+}
+
+/* Bluetooth */
+
+async function connectBluetooth(){
+
+    if(!navigator.bluetooth){
+        alert("Bluetooth API not supported");
+        return;
+    }
+
+    try{
+
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices:true,
+            optionalServices:['battery_service']
+        });
+
+        const container = document.getElementById("bluetoothDevices");
+
+        container.innerHTML = `
+            <div class="device">
+                <span>${device.name || 'Unknown Device'}</span>
+                <span>Connected ✅</span>
+            </div>
+        `;
+
+        addLog("Bluetooth Connected: " + (device.name || 'Unknown'));
+
+    }catch(error){
+
+        addLog("Bluetooth Error");
+
+        console.error(error);
+    }
+}
+
+/* WiFi */
+
+function refreshWifi(){
+
+    const online = navigator.onLine;
+
+    document.getElementById("wifiStatus").innerHTML =
+        online ? "📶 WIFI CONNECTED" : "❌ OFFLINE";
+
+    document.getElementById("networkName").innerText =
+        online ? "Internet Connected" : "No Network";
+
+    addLog("WiFi Status Refreshed");
+}
+
+refreshWifi();
+
+/* Vibrate */
+
+function vibrateDevice(){
+
+    if(navigator.vibrate){
+
+        navigator.vibrate([300,100,300]);
+
+        addLog("Device Vibrated");
+
+    }else{
+        addLog("Vibration Not Supported");
+    }
+}
+
+/* Fullscreen */
+
+function toggleFullscreen(){
+
+    if(!document.fullscreenElement){
+
+        document.documentElement.requestFullscreen();
+
+        addLog("Fullscreen Enabled");
+
+    }else{
+
+        document.exitFullscreen();
+
+        addLog("Fullscreen Disabled");
+    }
+}
+
+/* Battery */
+
+async function showBattery(){
+
+    if(navigator.getBattery){
+
+        const battery = await navigator.getBattery();
+
+        const level = Math.floor(battery.level * 100);
+
+        addLog("Battery Level: " + level + "%");
+
+        alert("Battery: " + level + "%");
+
+    }else{
+
+        addLog("Battery API Unsupported");
+    }
+}
+
+/* Voice Recognition */
+
+function startVoice(){
+
+    const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert("Voice Recognition Unsupported");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'en-US';
+
+    recognition.start();
+
+    recognition.onstart = ()=>{
+
+        addVoice("Voice Recognition Started...");
+    };
+
+    recognition.onresult = (event)=>{
+
+        const command = event.results[0][0].transcript;
+
+        addVoice("Command: " + command);
+
+        executeCommand(command.toLowerCase());
+    };
+
+    recognition.onerror = ()=>{
+
+        addVoice("Voice Recognition Error");
+    };
+}
+
+function addVoice(message){
+
+    const logs = document.getElementById("voiceLogs");
+
+    const div = document.createElement("div");
+
+    div.className = "log";
+
+    div.innerText = message;
+
+    logs.prepend(div);
+}
+
+/* Voice Commands */
+
+function executeCommand(command){
+
+    if(command.includes("fullscreen")){
+
+        toggleFullscreen();
+    }
+
+    else if(command.includes("battery")){
+
+        showBattery();
+    }
+
+    else if(command.includes("vibrate")){
+
+        vibrateDevice();
+    }
+
+    else{
+
+        addVoice("Unknown Command");
+    }
+}
+
+/* Online Offline Detection */
+
+window.addEventListener('online',()=>{
+
+    refreshWifi();
+
+    addLog("Internet Reconnected");
+});
+
+window.addEventListener('offline',()=>{
+
+    refreshWifi();
+
+    addLog("Internet Lost");
+});
+
+/* Startup Animation */
+
+window.onload = ()=>{
+
+    addLog("System Initialized");
+    addLog("Dashboard Ready");
+    addLog("Security Layer Active");
+};
+
+</script>
+
+</body>
+</html>
